@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🌼 Arreglo de Flores Amarillas Para mi Preciosa 🌼</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to top, #fff7d6, #ffe97d);
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .mensaje {
+      position: absolute;
+      top: 10%;
+      width: 100%;
+      text-align: center;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #b37400;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .submensaje {
+      position: absolute;
+      top: 20%;
+      width: 100%;
+      text-align: center;
+      font-size: 1.5em;
+      color: #804000;
+    }
+    audio {
+      display: none; /* Oculta el reproductor de música */
+    }
+    /* Botón pequeño en esquina superior derecha */
+    #playBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      background-color: #ffd700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+    }
+    #playBtn:hover {
+      background-color: #ffeb3b;
+    }
+  </style>
+</head>
+<body>
+  <div class="mensaje">🌼 Feliz Día de las Flores Amarillas Amorcito 🌼</div>
+  <div class="submensaje">Para ti, con todo mi amor y cariño preciosa 💛</div>
+
+  <!-- 🎶 Música MP3 -->
+  <audio id="musica" src="flores.mp3" loop></audio>
+  <button id="playBtn">🎵</button>
+
+  <script>
+    let petals = [];
+    let hearts = [];
+    let bouquets = [];
+    let numBouquets = 10; // Más ramos para que estén más juntos
+    let maxBouquetHeight = 0.4; // altura máxima relativa
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+
+      // Inicializar pétalos y corazones
+      for (let i = 0; i < 60; i++) petals.push(new Petal());
+      for (let i = 0; i < 25; i++) hearts.push(new Heart());
+
+      // Inicializar ramos
+      for (let i = 0; i < numBouquets; i++) {
+        let x = map(i, 0, numBouquets - 1, 50, width - 50);
+        bouquets.push({x: x, height: 0, growing: true});
+      }
+    }
+
+    function draw() {
+      clear();
+
+      // Pétalos cayendo
+      for (let p of petals) {
+        p.update();
+        p.show();
+      }
+
+      // Corazones cayendo
+      for (let h of hearts) {
+        h.update();
+        h.show();
+      }
+
+      // Dibujar cada ramo
+      for (let b of bouquets) {
+        drawBouquet(b);
+      }
+    }
+
+    // 🌼 Clase Petal
+    class Petal {
+      constructor() {
+        this.x = random(width);
+        this.y = random(-height, 0);
+        this.size = random(15, 30);
+        this.speed = random(1, 2);
+        this.angle = random(TWO_PI);
+        this.spin = random(0.01, 0.03);
+        this.color = color(255, 220, 0, 200);
+      }
+      update() {
+        this.y += this.speed;
+        this.angle += this.spin;
+        if (this.y > height) {
+          this.y = random(-50, -10);
+          this.x = random(width);
+        }
+      }
+      show() {
+        push();
+        translate(this.x, this.y);
+        rotate(this.angle);
+        noStroke();
+        ellipse(0, 0, this.size * 2, this.size);
+        pop();
+      }
+    }
+
+    // 💖 Clase Heart
+    class Heart {
+      constructor() {
+        this.x = random(width);
+        this.y = random(-height, 0);
+        this.size = random(15, 25);
+        this.speed = random(1, 1.8);
+        this.color = color(255, 100, 120, 220);
+      }
+      update() {
+        this.y += this.speed;
+        if (this.y > height) {
+          this.y = random(-50, -10);
+          this.x = random(width);
+        }
+      }
+      show() {
+        push();
+        translate(this.x, this.y);
+        fill(this.color);
+        noStroke();
+        beginShape();
+        vertex(0, -this.size / 4);
+        bezierVertex(-this.size / 2, -this.size / 2, -this.size, this.size / 3, 0, this.size);
+        bezierVertex(this.size, this.size / 3, this.size / 2, -this.size / 2, 0, -this.size / 4);
+        endShape(CLOSE);
+        pop();
+      }
+    }
+
+    // 🌻 Función para dibujar un ramo individual
+    function drawBouquet(b) {
+      if (b.growing && b.height < height * maxBouquetHeight) {
+        b.height += 2;
+      }
+
+      push();
+      translate(b.x, height);
+
+      // Tallo
+      stroke(34, 139, 34);
+      strokeWeight(8);
+      line(0, 0, 0, -b.height);
+
+      // Flores amarillas arriba del tallo
+      if (b.height > 50) drawFlower(0, -b.height + 20, color(255, 220, 0), 25, 12); // Flor central
+
+      // Flores laterales pequeñas
+      if (b.height > 100) {
+        drawFlower(-30, -b.height + 60, color(255, 200, 0), 15, 10); // izquierda
+        drawFlower(30, -b.height + 60, color(255, 200, 0), 15, 10); // derecha
+      }
+
+      // Rosas amarillas opcionales
+      if (b.height > 150) {
+        drawRose(-15, -b.height + 90, color(255, 200, 0), 20);
+        drawRose(15, -b.height + 90, color(255, 200, 0), 20);
+      }
+
+      pop();
+    }
+
+    // 🌼 Función para dibujar flores normales
+    function drawFlower(x, y, c, size, petalCount) {
+      push();
+      translate(x, y);
+      noStroke();
+      fill(c);
+      for (let i = 0; i < petalCount; i++) {
+        ellipse(0, 0, size * 6, size);
+        rotate(TWO_PI / petalCount);
+      }
+      fill(139, 69, 19);
+      ellipse(0, 0, size * 1.5, size * 1.5); // centro
+      pop();
+    }
+
+    // 🌹 Función para dibujar rosa simplificada
+    function drawRose(x, y, c, size) {
+      push();
+      translate(x, y);
+      noStroke();
+      fill(c);
+      for (let i = 0; i < 5; i++) {
+        ellipse(0, i * size * 0.2, size, size * 0.6);
+        rotate(PI / 10);
+      }
+      pop();
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+
+    // 🎵 Reproducir música con clic en botón
+    const musica = document.getElementById('musica');
+    const btn = document.getElementById('playBtn');
+
+    btn.addEventListener('click', () => {
+      musica.play();
+      btn.style.display = 'none'; // Oculta el botón después de reproducir
+    });
+  </script>
+</body>
+</html>
